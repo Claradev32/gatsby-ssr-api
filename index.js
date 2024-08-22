@@ -12,8 +12,24 @@ const users = require('./data/users');
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/api/products', (req, res) => {
-  res.json(products);
+app.get("/api/products", (req, res) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const pageSize = parseInt(req.query.pageSize, 10) || 10;
+
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
+  const totalProducts = products.length;
+  const totalPages = Math.ceil(totalProducts / pageSize);
+
+  const paginatedProducts = products.slice(startIndex, endIndex);
+
+  res.json({
+    products: paginatedProducts,
+    totalProducts,
+    totalPages,
+    currentPage: page,
+    pageSize,
+  });
 });
 
 app.post('/api/login', (req, res) => {
